@@ -35,11 +35,18 @@ export function App() {
   }
 
   function onNoteDeleted(id: string) {
-    const notesArray = notes.filter(note => {
-      return note.id !== id
-    })
+    const notesArray = notes.filter((note) => {
+      return note.id !== id;
+    });
+    const notesOnStorage = localStorage.getItem("notes");
+    if (notesOnStorage) {
+      const notes = JSON.parse(notesOnStorage) as Note[];
+      const filteredNotesDifferenceId = notes.filter((note) => note.id !== id);
+      
+      localStorage.setItem("notes", JSON.stringify(filteredNotesDifferenceId));
+    }
 
-    setNotes(notesArray)
+    setNotes(notesArray);
   }
 
   function handleSearch(event: ChangeEvent<HTMLInputElement>) {
@@ -48,7 +55,12 @@ export function App() {
     setSearch(query);
   }
 
-  const filteredNotes = search !== "" ? notes.filter(note => note.content.toLocaleLowerCase().includes(search.toLocaleLowerCase())) : notes
+  const filteredNotes =
+    search !== ""
+      ? notes.filter((note) =>
+          note.content.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        )
+      : notes;
 
   return (
     <>
