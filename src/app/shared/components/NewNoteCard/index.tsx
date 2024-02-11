@@ -1,10 +1,10 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 interface NewNoteCardProps {
-  onNoteCreated: (content: string) => void;
+  onNoteCreated: (content: string, title: string) => void;
 }
 
 let speechRecognition: SpeechRecognition | null = null;
@@ -12,27 +12,37 @@ let speechRecognition: SpeechRecognition | null = null;
 export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
   const [shouldShowOnBoarding, setShouldShowOnBoarding] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
-  const [content, setContent] = useState("");
+  const [notesContent, setNotesContent] = useState({
+    content: "",
+    title: "",
+  });
 
   function handleStartEditor() {
     setShouldShowOnBoarding(false);
   }
 
-  function handleContentChanged(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    const { value } = e.target;
-    setContent(value);
+  function handleContentChanged(
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) {
+    const { value, name } = e.target;
 
-    if (value === "") setShouldShowOnBoarding(true);
+    setNotesContent({
+      ...notesContent,
+      [name]: value,
+    });
+
+    if (value === "" && name !== "title") setShouldShowOnBoarding(true);
   }
 
   function handleSaveNote(e: React.FormEvent) {
     e.preventDefault();
+    const { content, title } = notesContent;
 
     if (content === "") return;
 
-    onNoteCreated(content);
+    onNoteCreated(content, title);
 
-    setContent("");
+    setNotesContent({ content: "", title: "" });
     setShouldShowOnBoarding(true);
 
     toast.success("Nota criada com sucesso!");
@@ -65,7 +75,10 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
         return text.concat(result[0].transcript);
       }, "");
 
-      setContent(transcription);
+      setNotesContent({
+        title: notesContent.title,
+        content: transcription,
+      });
     };
 
     speechRecognition.onerror = (event) => {
@@ -77,6 +90,7 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
 
   function handleStopRecording() {
     setIsRecording(false);
+    setShouldShowOnBoarding(true);
 
     if (speechRecognition !== null) speechRecognition.stop();
   }
@@ -127,12 +141,22 @@ export function NewNoteCard({ onNoteCreated }: NewNoteCardProps) {
                   </button>
                 </p>
               ) : (
-                <textarea
-                  autoFocus
-                  className="text-sm leading-6 text-slate-400 bg-transparent resize-none flex-1 outline-none"
-                  value={content}
-                  onChange={handleContentChanged}
-                />
+                <>
+                  <input
+                    className="w-full bg-transparent text-1xl font-semibold tracking-tight outline-none placeholder:text-slate-500"
+                    name="title"
+                    value={notesContent.title}
+                    onChange={handleContentChanged}
+                    placeholder="Adicione um título"
+                  />
+                  <textarea
+                    autoFocus
+                    className="text-sm leading-6 text-slate-400 bg-transparent resize-none flex-1 outline-none"
+                    name="content"
+                    value={notesContent.content}
+                    onChange={handleContentChanged}
+                  />
+                </>
               )}
             </div>
 

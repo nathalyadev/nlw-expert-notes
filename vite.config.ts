@@ -4,7 +4,7 @@ import checker from 'vite-plugin-checker'
 
 export default defineConfig({
   plugins: [react(), checker({ typescript: true })],
-  base: "/nlw-expert-notes/",
+  base: "/nlw_expert_notes/",
   server: {
     host: "0.0.0.0",
   },

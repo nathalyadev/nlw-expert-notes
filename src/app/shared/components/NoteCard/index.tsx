@@ -2,23 +2,26 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Note } from "../../app";
+import { Note } from "../../../pages";
 
 interface NoteCardProps {
   note: Note;
   onNoteDeleted: (id: string) => void;
 }
 
-export function NoteCard({ note,onNoteDeleted }: NoteCardProps) {
+export function NoteCard({ note, onNoteDeleted }: NoteCardProps) {
   return (
     <Dialog.Root>
       <Dialog.Trigger className="rounded-md text-left flex flex-col bg-slate-800 p-5 gap-3 overflow-hidden relative outline-none hover:ring-2 hover:ring-slate-600 focus-visible:ring-2 focus-visible:ring-lime-400">
-        <span className="text-sm font-medium text-slate-300">
-          {formatDistanceToNow(note.date, {
-            locale: ptBR,
-            addSuffix: true,
-          })}
-        </span>
+        <div className="flex justify-between w-full">
+          <p className="text-sm leading-6 text-slate-300">{note.title}</p>
+          <span className="text-sm font-medium text-slate-300">
+            {formatDistanceToNow(note.date, {
+              locale: ptBR,
+              addSuffix: true,
+            })}
+          </span>
+        </div>
         <p className="text-sm leading-6 text-slate-400">{note.content}</p>
 
         <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black/60 to-black/0 pointer-events-none" />
@@ -32,19 +35,21 @@ export function NoteCard({ note,onNoteDeleted }: NoteCardProps) {
           </Dialog.Close>
 
           <div className="flex flex-1 flex-col gap-3 p-5">
+            <p className="text-1xl leading-6 text-slate-300">{note.title}</p>
             <span className="text-sm font-medium text-slate-300">
               {formatDistanceToNow(note.date, {
                 locale: ptBR,
                 addSuffix: true,
               })}
             </span>
+
             <p className="text-sm leading-6 text-slate-400">{note.content}</p>
           </div>
 
           <button
             type="button"
             className="w-full bg-slate-800 py-4 text-center text-sm text-slate-300 outline-none font-medium group"
-            onClick={()=>onNoteDeleted(note.id)}
+            onClick={() => onNoteDeleted(note.id)}
           >
             Deseja{" "}
             <span className="text-red-400 group-hover:underline">
